@@ -41,8 +41,26 @@ services:
       - '3306:3306'
     volumes:
       - db_data:/var/lib/mysql
+  
   redis:
     image: redis:7.2
 
+  elasticsearch:
+    image: elasticsearch:7.16.1
+    environment:
+      - cluster.name=elasticsearch-rails
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
 volumes:
   db_data:
+  esdata1:

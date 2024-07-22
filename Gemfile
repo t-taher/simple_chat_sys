@@ -45,5 +45,9 @@ group :development do
   # gem "spring"
 end
 
-
+# Background Worker
 gem "sidekiq", "~> 7.3"
+
+# ElasticSearch
+gem 'elasticsearch-model'
+gem 'elasticsearch-rails'

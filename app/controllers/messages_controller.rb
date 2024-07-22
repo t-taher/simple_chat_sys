@@ -8,6 +8,16 @@ class MessagesController < ApplicationController
     render json: @messages
   end
 
+  # SEARCH /messages/search?q=
+  def search
+    vars = request.query_parameters
+    word = vars["q"]
+    app_token = params[:application_token]
+    chat_number = params[:chat_number]
+    @msgs = Message.search(word, app_token, chat_number)
+    render json: @msgs, only: [:number,:msg_body, :created_at]
+  end
+  
   # GET /messages/1
   def show
     render json: @message
