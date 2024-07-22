@@ -15,15 +15,17 @@ class ChatsController < ApplicationController
 
   # POST /chats
   def create
-    @chat = Chat.new(chat_params)
+    redis = Rails.cache.redis.checkout
+    app_token = params[:application_token]
+    # TODO: Atom
+    chats_count = redis.incr("applicaiton_#{app_token}_chats_count")
+    PresistChatInDbJob.perform_async(app_token, chats_count)
 
-    if @chat.save
-      render json: @chat, status: :created, location: @chat, only: [:number,:created_at], include: [:application => {:only => :token}]
-    else
-      render json: @chat.errors, status: :unprocessable_entity
-    end
+    Rails.cache.redis.checkin
+
+    render json: x = {application_token: app_token, number: chats_count}, status: :created
   end
-
+  
   # PATCH/PUT /chats/1
   def update
     if @chat.update(chat_params)
@@ -46,6 +48,6 @@ class ChatsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def chat_params
-      params.require(:chat).permit(:number, :application_token)
+      params.require(:chat)
     end
 end

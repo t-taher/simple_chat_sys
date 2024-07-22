@@ -12,16 +12,19 @@ class MessagesController < ApplicationController
   def show
     render json: @message
   end
-
-  # POST /messages
+  
   def create
-    @message = Message.new(message_params)
+    redis = Rails.cache.redis.checkout
+    app_token = params[:application_token]
+    chat_number = params[:chat_number]
+    msg = message_params[:msg_body]
+    # TODO: Atom
+    msgs_count = redis.incr("chat_#{app_token}_#{chat_number}_msgs_count")
+    PresistAndIndexMsgJob.perform_async(app_token, chat_number, msgs_count, msg)
 
-    if @message.save
-      render json: @message, status: :created, location: @message
-    else
-      render json: @message.errors, status: :unprocessable_entity
-    end
+    Rails.cache.redis.checkin
+
+    render json: x = {application_token: app_token, chat_number: chat_number, number: msgs_count, msg_body: msg}, status: :created
   end
 
   # PATCH/PUT /messages/1
@@ -46,6 +49,6 @@ class MessagesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def message_params
-      params.require(:message).permit(:number, :chat_id)
+      params.require(:message).permit(:msg_body)
     end
 end
