@@ -5,7 +5,7 @@ class MessagesController < ApplicationController
   def index
     @messages = Message.all
 
-    render json: @messages
+    render json: @messages, only: [:number, :msg_body, :created_at]
   end
 
   # SEARCH /messages/search?q=
@@ -15,12 +15,12 @@ class MessagesController < ApplicationController
     app_token = params[:application_token]
     chat_number = params[:chat_number]
     @msgs = Message.search(word, app_token, chat_number)
-    render json: @msgs, only: [:number,:msg_body, :created_at]
+    render json: @msgs, only: [:number, :msg_body, :created_at]
   end
   
   # GET /messages/1
   def show
-    render json: @message
+    render json: @message, only: [:number, :msg_body, :created_at]
   end
   
   def create
@@ -34,13 +34,13 @@ class MessagesController < ApplicationController
 
     Rails.cache.redis.checkin
 
-    render json: x = {application_token: app_token, chat_number: chat_number, number: msgs_count, msg_body: msg}, status: :created
+    render json: x = {number: msgs_count, msg_body: msg}, status: :created
   end
 
   # PATCH/PUT /messages/1
   def update
     if @message.update(message_params)
-      render json: @message
+      render json: @message, only: [:number, :msg_body]
     else
       render json: @message.errors, status: :unprocessable_entity
     end
