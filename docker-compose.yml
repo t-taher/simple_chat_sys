@@ -6,6 +6,7 @@ services:
     depends_on:     
       - database
       - redis
+    restart: always
     volumes:
       - .:/rails
     environment:
