@@ -29,7 +29,10 @@ module Searchable
             "must": [
               {
                 "match": {
-                  "msg_body": q
+                  "msg_body": {
+                    "query": q,
+                    "fuzziness": "AUTO"
+                  }
                 }
               },
               {

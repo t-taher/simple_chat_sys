@@ -12,10 +12,14 @@ class MessagesController < ApplicationController
   def search
     vars = request.query_parameters
     word = vars["q"]
-    app_token = params[:application_token]
-    chat_number = params[:chat_number]
-    @msgs = Message.search(word, app_token, chat_number)
-    render json: @msgs, only: [:number, :msg_body, :created_at]
+    if vars[:q].nil?
+      render json: {error: "Must provide search keyword"}, status: :bad_request
+    else
+      app_token = params[:application_token]
+      chat_number = params[:chat_number]
+      @msgs = Message.search(word, app_token, chat_number)
+      render json: @msgs, only: [:number, :msg_body, :created_at]
+    end
   end
   
   # GET /messages/1
@@ -54,7 +58,7 @@ class MessagesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_message
-      @message = Message.find(params[:id])
+      @message = Message.find_by(number: params[:number])
     end
 
     # Only allow a list of trusted parameters through.
