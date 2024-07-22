@@ -28,10 +28,9 @@ module Searchable
           "bool": {
             "must": [
               {
-                "match": {
+                "wildcard": {
                   "msg_body": {
-                    "query": q,
-                    "fuzziness": "AUTO"
+                    "value": "*#{q}*"
                   }
                 }
               },
