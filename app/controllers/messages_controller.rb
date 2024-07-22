@@ -3,7 +3,11 @@ class MessagesController < ApplicationController
 
   # GET /messages
   def index
-    @messages = Message.all
+    vars = request.query_parameters
+    limit = vars[:limit] || 5
+    offset = vars[:offset] || 0
+
+    @messages = Message.limit(limit).offset(offset).order(number: :desc)
 
     render json: @messages, only: [:number, :msg_body, :created_at]
   end

@@ -3,14 +3,18 @@ class ApplicationsController < ApplicationController
 
   # GET /applications
   def index
-    @applications = Application.all
+    vars = request.query_parameters
+    limit = vars[:limit] || 5
+    offset = vars[:offset] || 0
 
-    render json: @applications, only: [:token, :name, :created_at]
+    @applications = Application.limit(limit).offset(offset).order(created_at: :desc)
+
+    render json: @applications, only: [:token, :name, :chats_count, :created_at]
   end
 
   # GET /applications/1
   def show
-    render json: @application, only: [:token, :name, :created_at]
+    render json: @application, only: [:token, :name, :chats_count, :created_at]
   end
 
   # POST /applications
@@ -18,7 +22,7 @@ class ApplicationsController < ApplicationController
     @application = Application.new(application_params)
 
     if @application.save
-      render json: @application, status: :created, location: @application, only: [:token, :name, :created_at]
+      render json: @application, status: :created, location: @application, only: [:token, :chats_count, :name, :created_at]
     else
       render json: @application.errors, status: :unprocessable_entity
     end
@@ -27,7 +31,7 @@ class ApplicationsController < ApplicationController
   # PATCH/PUT /applications/1
   def update
     if @application.update(application_params)
-      render json: @application, only: [:token, :name, :created_at]
+      render json: @application, only: [:token, :name, :chats_count, :created_at]
     else
       render json: @application.errors, status: :unprocessable_entity
     end

@@ -3,14 +3,18 @@ class ChatsController < ApplicationController
 
   # GET /chats
   def index
-    @chats = Chat.joins(:application).where(application: { token: params[:application_token] }).includes(:application)
+    vars = request.query_parameters
+    limit = vars[:limit] || 5
+    offset = vars[:offset] || 0
 
-    render json: @chats, only: [:number, :created_at], include: [:application => {:only => :token}]
+    @chats = Chat.limit(limit).offset(offset).order(number: :desc).joins(:application).where(application: { token: params[:application_token] }).includes(:application)
+
+    render json: @chats, only: [:number, :msg_count, :created_at], include: [:application => {:only => :token}]
   end
 
   # GET /chats/1
   def show
-    render json: @chat, only: [:number,:created_at], include: [:application => {:only => :token}]
+    render json: @chat, only: [:number, :msg_count, :created_at], include: [:application => {:only => :token}]
   end
 
   # POST /chats
@@ -29,7 +33,7 @@ class ChatsController < ApplicationController
   # PATCH/PUT /chats/1
   def update
     if @chat.update(chat_params)
-      render json: @chat, only: [:number,:created_at], include: [:application => {:only => :token}]
+      render json: @chat, only: [:number, :msg_count, :created_at], include: [:application => {:only => :token}]
     else
       render json: @chat.errors, status: :unprocessable_entity
     end
