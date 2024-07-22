@@ -8,6 +8,6 @@ class PresistAndIndexMsgJob
       msg = Message.create(chat_id: chat.id, number: msg_number, msg_body: msg_body)
       chat.increment! :msg_count
     end
-    puts "Success presisted msg with app_token: #{app_token}, chat_number: #{chat_number}, msg_number: #{msg_number}"
+    Rails.logger.debug "Success presisted msg with app_token: #{app_token}, chat_number: #{chat_number}, msg_number: #{msg_number}"
   end
 end

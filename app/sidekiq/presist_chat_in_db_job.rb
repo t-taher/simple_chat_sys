@@ -7,6 +7,6 @@ class PresistChatInDbJob
       chat = Chat.create(application_id: app.id, number: chat_number)
       app.increment! :chats_count
     end
-    puts "Success presisted chat with app_token: #{app_token}, number: #{chat_number}"
+    Rails.logger.debug "Success presisted chat with app_token: #{app_token}, number: #{chat_number}"
   end
 end
