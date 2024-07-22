@@ -3,14 +3,14 @@ class ChatsController < ApplicationController
 
   # GET /chats
   def index
-    @chats = Chat.all
+    @chats = Chat.joins(:application).where(application: { token: params[:application_token] }).includes(:application)
 
-    render json: @chats
+    render json: @chats, only: [:number, :created_at], include: [:application => {:only => :token}]
   end
 
   # GET /chats/1
   def show
-    render json: @chat
+    render json: @chat, only: [:number,:created_at], include: [:application => {:only => :token}]
   end
 
   # POST /chats
@@ -18,7 +18,7 @@ class ChatsController < ApplicationController
     @chat = Chat.new(chat_params)
 
     if @chat.save
-      render json: @chat, status: :created, location: @chat
+      render json: @chat, status: :created, location: @chat, only: [:number,:created_at], include: [:application => {:only => :token}]
     else
       render json: @chat.errors, status: :unprocessable_entity
     end
@@ -27,7 +27,7 @@ class ChatsController < ApplicationController
   # PATCH/PUT /chats/1
   def update
     if @chat.update(chat_params)
-      render json: @chat
+      render json: @chat, only: [:number,:created_at], include: [:application => {:only => :token}]
     else
       render json: @chat.errors, status: :unprocessable_entity
     end
@@ -41,11 +41,11 @@ class ChatsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_chat
-      @chat = Chat.find(params[:id])
+      @chat = Chat.joins(:application).where(application: { token: params[:application_token] }).includes(:application).find_by(number: params[:number])
     end
 
     # Only allow a list of trusted parameters through.
     def chat_params
-      params.require(:chat).permit(:number, :application_id)
+      params.require(:chat).permit(:number, :application_token)
     end
 end
