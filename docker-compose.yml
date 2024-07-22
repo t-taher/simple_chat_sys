@@ -1,41 +1,31 @@
 services:
-  app: 
+  app: &app
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:     
       - database
       - redis
+    volumes:
+      - .:/rails
+    environment:
+      RAILS_ENV: development
     ports: 
       - "3000:3000"
-    volumes:
-      - .:/rails
-    environment:
-      RAILS_ENV: development
+    command: ./bin/rails server -b 0.0.0.0
 
-  worker: 
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:     
-      - database
-      - redis
+  worker: &worker
+    <<: *app
+    ports: []
     command: bundle exec sidekiq
-    volumes:
-      - .:/rails
-    environment:
-      RAILS_ENV: development
 
   database:
     image: mysql:9.0
     restart: always
     environment:
       MYSQL_DATABASE: 'db'
-      # So you don't have to use root, but you can if you like
       MYSQL_USER: 'user'
-      # You can use whatever password you like
       MYSQL_PASSWORD: 'password'
-      # Password for root access
       MYSQL_ROOT_PASSWORD: 'password'
     ports:
       - '3306:3306'
