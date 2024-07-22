@@ -13,6 +13,19 @@ services:
     environment:
       RAILS_ENV: development
 
+  worker: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:     
+      - database
+      - redis
+    command: bundle exec sidekiq
+    volumes:
+      - .:/rails
+    environment:
+      RAILS_ENV: development
+
   database:
     image: mysql:9.0
     restart: always
@@ -29,7 +42,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
   redis:
-    image: redis:5.0.7
+    image: redis:7.2
 
 volumes:
   db_data:
