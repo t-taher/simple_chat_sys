@@ -11,3 +11,7 @@ docker compose up --build
 
 -------------
 
+**Routes**
+
+Postman collection is included under:
+`docs/postman_collection/chat_sys.postman_collection.json`
