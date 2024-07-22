@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :applications, param: :token do
+  resources :applications, :path => "api/v1/applicaitons/", param: :token do
     resources :chats, param: :number do
       get "messages/search", to: "messages#search"
       resources :messages, param: :number
